@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import permissions
 from .models import Category, Subcategory, Product, Cart, CartItem
 from .serializers import (
     CategorySerializer,
@@ -8,7 +8,6 @@ from .serializers import (
     CartSerializer,
 )
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from http import HTTPStatus
@@ -43,23 +42,23 @@ class CartViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с корзинами."""
 
     serializer_class = CartSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Cart.objects.filter(user=1)  # self.request.user)
+        return Cart.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=1)  # self.request.user)
+        serializer.save(user=self.request.user)
 
 
 class CartItemViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с конкретной корзиной."""
 
     serializer_class = CartItemSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        cart = Cart.objects.get(user=1)  # self.request.user)
+        cart = Cart.objects.get(user=self.request.user)
         return CartItem.objects.filter(cart=cart)
 
     def create(self, request):
